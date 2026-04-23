@@ -1,18 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Search, Filter, CheckCircle, XCircle } from 'lucide-react';
+import api from '../api/axios';
 import './TablePage.css';
 
 const Applications = () => {
   const [applications, setApplications] = useState([]);
 
   useEffect(() => {
-    // Mock Data
-    setApplications([
-      { id: 1, studentName: 'Alice Johnson', usn: '1RV20CS001', company: 'Google', role: 'SDE', round: 'Technical', status: 'Shortlisted' },
-      { id: 2, studentName: 'Diana Prince', usn: '1RV20CS015', company: 'Amazon', role: 'SDE', round: 'HR', status: 'Placed' },
-      { id: 3, studentName: 'Bob Smith', usn: '1RV20CS002', company: 'Microsoft', role: 'Cloud Engineer', round: 'Aptitude', status: 'Rejected' },
-      { id: 4, studentName: 'Evan Davis', usn: '1RV20IS022', company: 'Goldman Sachs', role: 'Analyst', round: 'Aptitude', status: 'Applied' },
-    ]);
+    const fetchApplications = async () => {
+      try {
+        const response = await api.get('/applications');
+        const fetchedApps = response.data.map(app => ({
+          id: app.id,
+          studentName: app.studentName || 'Unknown Student',
+          usn: `USR-${app.studentId}`, // Mock USN if missing
+          company: app.companyName || 'Unknown Company',
+          role: app.role || 'Unknown Role',
+          round: 'Initial',
+          status: app.status || 'APPLIED'
+        }));
+        setApplications(fetchedApps);
+      } catch (error) {
+        console.error("Error fetching applications", error);
+      }
+    };
+    
+    fetchApplications();
   }, []);
 
   return (

@@ -1,17 +1,26 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Users, Briefcase, FileText, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, FileText, Settings, UserCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './Sidebar.css';
 
-const navItems = [
+const adminNavItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/students', label: 'Students', icon: Users },
   { path: '/companies', label: 'Companies', icon: Briefcase },
   { path: '/applications', label: 'Applications', icon: FileText },
 ];
 
+const studentNavItems = [
+  { path: '/student-dashboard', label: 'My Dashboard', icon: LayoutDashboard },
+  { path: '/profile', label: 'My Profile', icon: UserCircle },
+];
+
 const Sidebar = () => {
   const location = useLocation();
+  const { user } = useAuth();
+
+  const navItems = user?.role === 'ADMIN' ? adminNavItems : studentNavItems;
 
   return (
     <aside className="sidebar">
@@ -22,7 +31,7 @@ const Sidebar = () => {
 
       <nav className="sidebar-nav">
         {navItems.map((item) => {
-          const isActive = location.pathname.startsWith(item.path);
+          const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
           const Icon = item.icon;
 
           return (

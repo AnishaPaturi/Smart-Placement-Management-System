@@ -1,10 +1,10 @@
-# 🚀 Smart Placement Management System
+# 🚀 Smart Placement Management System v2.0
 
 A robust, scalable, and premium platform designed to streamline and automate the campus placement process for both students and placement administrators. 
 
 ## 📖 Summary of the Application
 
-The Smart Placement Management System is a full-stack web application designed to bridge the gap between students, colleges, and hiring companies. It replaces manual, spreadsheet-based placement tracking with an automated, data-driven platform. The system boasts a powerful Java Spring Boot backend featuring an intelligent eligibility engine and shortlisting algorithm, coupled with a visually stunning, responsive React frontend utilizing modern glassmorphism aesthetics and smooth animations.
+The Smart Placement Management System is a full-stack web application designed to bridge the gap between students, colleges, and hiring companies. It replaces manual, spreadsheet-based placement tracking with an automated, data-driven platform. The system boasts a powerful Java Spring Boot backend featuring an intelligent eligibility engine, role-based dynamic dashboards, and fully integrated real-time database tracking, coupled with a visually stunning, responsive React frontend utilizing modern glassmorphism aesthetics and smooth animations.
 
 ## ✨ Features of the Application
 

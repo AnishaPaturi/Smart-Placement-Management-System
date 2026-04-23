@@ -1,18 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Building } from 'lucide-react';
+import api from '../api/axios';
 import './TablePage.css';
 
 const Companies = () => {
   const [companies, setCompanies] = useState([]);
 
   useEffect(() => {
-    // Mock Data
-    setCompanies([
-      { id: 1, name: 'Google', sector: 'Technology', role: 'SDE', ctc: '24 LPA', status: 'Hiring' },
-      { id: 2, name: 'Microsoft', sector: 'Technology', role: 'Cloud Engineer', ctc: '22 LPA', status: 'Upcoming' },
-      { id: 3, name: 'Goldman Sachs', sector: 'Finance', role: 'Analyst', ctc: '20 LPA', status: 'Completed' },
-      { id: 4, name: 'Amazon', sector: 'E-commerce', role: 'SDE', ctc: '28 LPA', status: 'Hiring' },
-    ]);
+    const fetchCompanies = async () => {
+      try {
+        const response = await api.get('/companies');
+        // We'll mock the role/ctc for now if it's not provided by the backend company model
+        const fetchedCompanies = response.data.map((c, index) => ({
+          id: c.id,
+          name: c.name,
+          sector: c.description || 'Technology', // mock sector using description
+          role: 'Various Roles', // mock role
+          ctc: 'TBD', // mock ctc
+          status: 'Hiring'
+        }));
+        setCompanies(fetchedCompanies);
+      } catch (error) {
+        console.error("Error fetching companies", error);
+      }
+    };
+    
+    fetchCompanies();
   }, []);
 
   return (

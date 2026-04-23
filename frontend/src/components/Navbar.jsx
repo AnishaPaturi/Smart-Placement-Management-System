@@ -1,7 +1,17 @@
-import { Bell, Search, User } from 'lucide-react';
+import { Bell, Search, User, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <header className="navbar">
       <div className="search-bar">
@@ -19,10 +29,13 @@ const Navbar = () => {
             <User size={18} />
           </div>
           <div className="user-info">
-            <span className="user-name">Admin User</span>
-            <span className="user-role">Placement Officer</span>
+            <span className="user-name">{user?.name || 'User'}</span>
+            <span className="user-role">{user?.role === 'ADMIN' ? 'Placement Officer' : 'Student'}</span>
           </div>
         </div>
+        <button className="icon-btn logout-btn" onClick={handleLogout} title="Logout">
+          <LogOut size={20} />
+        </button>
       </div>
     </header>
   );

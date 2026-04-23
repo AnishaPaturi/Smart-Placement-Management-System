@@ -1,15 +1,46 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Building, FileText, TrendingUp } from 'lucide-react';
+import api from '../api/axios';
 import './Dashboard.css';
 
-const statCards = [
-  { title: 'Total Students', value: '1,248', icon: Users, color: 'var(--brand-primary)', change: '+12%' },
-  { title: 'Companies Hiring', value: '42', icon: Building, color: 'var(--brand-accent)', change: '+5%' },
-  { title: 'Active Applications', value: '856', icon: FileText, color: 'var(--success)', change: '+24%' },
-  { title: 'Placement Rate', value: '78%', icon: TrendingUp, color: 'var(--warning)', change: '+2%' },
-];
-
 const Dashboard = () => {
+  const [stats, setStats] = useState({
+    students: 0,
+    companies: 0,
+    applications: 0,
+    placedRate: '0%'
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [studentsRes, companiesRes] = await Promise.all([
+          api.get('/students'),
+          api.get('/companies')
+        ]);
+        
+        setStats({
+          students: studentsRes.data.length,
+          companies: companiesRes.data.length,
+          applications: 15, // Mock for now until applications endpoint is solid
+          placedRate: '24%' // Mock rate
+        });
+      } catch (error) {
+        console.error("Error fetching dashboard stats", error);
+      }
+    };
+    
+    fetchStats();
+  }, []);
+
+  const statCards = [
+    { title: 'Total Students', value: stats.students, icon: Users, color: 'var(--brand-primary)', change: '+2%' },
+    { title: 'Companies Hiring', value: stats.companies, icon: Building, color: 'var(--brand-accent)', change: '+5%' },
+    { title: 'Active Applications', value: stats.applications, icon: FileText, color: 'var(--success)', change: '+12%' },
+    { title: 'Placement Rate', value: stats.placedRate, icon: TrendingUp, color: 'var(--warning)', change: '+2%' },
+  ];
+
   return (
     <div className="dashboard-page animate-fade-in">
       <div className="page-header">

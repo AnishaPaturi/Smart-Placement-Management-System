@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../api/axios';
 import { Search, Filter, MoreVertical, Plus } from 'lucide-react';
 import './TablePage.css';
 
@@ -7,17 +8,25 @@ const Students = () => {
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    // In a real app, this would fetch from the actual API
-    // axios.get('http://localhost:8080/api/students').then(res => setStudents(res.data));
+    const fetchStudents = async () => {
+      try {
+        const response = await api.get('/students');
+        // Map the backend data format to the table format
+        const fetchedStudents = response.data.map(s => ({
+          id: s.id,
+          name: s.name,
+          usn: s.email.split('@')[0], // Using email prefix as mock USN for now
+          branch: s.branch,
+          cgpa: s.cgpa,
+          status: s.activeBacklogs === 0 ? 'Eligible' : 'Not Eligible'
+        }));
+        setStudents(fetchedStudents);
+      } catch (error) {
+        console.error("Error fetching students", error);
+      }
+    };
     
-    // Mock Data
-    setStudents([
-      { id: 1, name: 'Alice Johnson', usn: '1RV20CS001', branch: 'Computer Science', cgpa: 9.2, status: 'Eligible' },
-      { id: 2, name: 'Bob Smith', usn: '1RV20CS002', branch: 'Information Science', cgpa: 8.5, status: 'Placed' },
-      { id: 3, name: 'Charlie Brown', usn: '1RV20EC005', branch: 'Electronics', cgpa: 7.8, status: 'Not Eligible' },
-      { id: 4, name: 'Diana Prince', usn: '1RV20CS015', branch: 'Computer Science', cgpa: 9.6, status: 'Placed' },
-      { id: 5, name: 'Evan Davis', usn: '1RV20IS022', branch: 'Information Science', cgpa: 8.1, status: 'Eligible' },
-    ]);
+    fetchStudents();
   }, []);
 
   return (

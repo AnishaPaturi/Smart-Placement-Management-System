@@ -1,20 +1,38 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogIn, Mail, Lock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
 import './Auth.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Mock login logic
-    if (email.includes('admin')) {
-      navigate('/dashboard');
-    } else {
-      navigate('/student-dashboard');
+    setError('');
+    
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      
+      if (response.data.success) {
+        login({
+          ...response.data.user,
+          role: response.data.role
+        });
+        
+        if (response.data.role === 'ADMIN') {
+          navigate('/dashboard');
+        } else {
+          navigate('/student-dashboard');
+        }
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
@@ -28,6 +46,7 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleLogin} className="auth-form">
+          {error && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
           <div className="input-group">
             <label>Email Address</label>
             <div className="input-with-icon">

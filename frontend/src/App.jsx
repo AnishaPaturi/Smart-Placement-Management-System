@@ -7,13 +7,30 @@ import Applications from './pages/Applications';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import StudentDashboard from './pages/StudentDashboard';
+import { useAuth } from './context/AuthContext';
 import './App.css';
+
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to={user.role === 'ADMIN' ? '/dashboard' : '/student-dashboard'} replace />;
+  }
+  
+  return children;
+};
 
 const AppContent = () => {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const { user } = useAuth();
 
   if (isAuthPage) {
+    if (user) {
+      return <Navigate to={user.role === 'ADMIN' ? '/dashboard' : '/student-dashboard'} replace />;
+    }
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -27,11 +44,15 @@ const AppContent = () => {
     <Layout>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/students" element={<Students />} />
-        <Route path="/companies" element={<Companies />} />
-        <Route path="/applications" element={<Applications />} />
-        <Route path="/student-dashboard" element={<StudentDashboard />} />
+        
+        {/* Admin Routes */}
+        <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['ADMIN']}><Dashboard /></ProtectedRoute>} />
+        <Route path="/students" element={<ProtectedRoute allowedRoles={['ADMIN']}><Students /></ProtectedRoute>} />
+        <Route path="/companies" element={<ProtectedRoute allowedRoles={['ADMIN']}><Companies /></ProtectedRoute>} />
+        <Route path="/applications" element={<ProtectedRoute allowedRoles={['ADMIN']}><Applications /></ProtectedRoute>} />
+        
+        {/* Student Routes */}
+        <Route path="/student-dashboard" element={<ProtectedRoute allowedRoles={['STUDENT']}><StudentDashboard /></ProtectedRoute>} />
       </Routes>
     </Layout>
   );
