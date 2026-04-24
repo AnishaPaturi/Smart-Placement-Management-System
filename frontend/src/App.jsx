@@ -7,6 +7,9 @@ import Applications from './pages/Applications';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import StudentDashboard from './pages/StudentDashboard';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Notifications from './pages/Notifications';
 import { useAuth } from './context/AuthContext';
 import './App.css';
 
@@ -53,6 +56,11 @@ const AppContent = () => {
         
         {/* Student Routes */}
         <Route path="/student-dashboard" element={<ProtectedRoute allowedRoles={['STUDENT']}><StudentDashboard /></ProtectedRoute>} />
+        
+        {/* Shared Routes */}
+        <Route path="/profile" element={<ProtectedRoute allowedRoles={['ADMIN', 'STUDENT']}><Profile /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute allowedRoles={['ADMIN', 'STUDENT']}><Settings /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute allowedRoles={['ADMIN', 'STUDENT']}><Notifications /></ProtectedRoute>} />
       </Routes>
     </Layout>
   );

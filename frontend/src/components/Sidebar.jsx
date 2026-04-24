@@ -13,7 +13,6 @@ const adminNavItems = [
 
 const studentNavItems = [
   { path: '/student-dashboard', label: 'My Dashboard', icon: LayoutDashboard },
-  { path: '/profile', label: 'My Profile', icon: UserCircle },
 ];
 
 const Sidebar = () => {
@@ -52,10 +51,10 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer">
-        <button className="nav-item">
+        <Link to="/settings" className={`nav-item ${location.pathname === '/settings' ? 'active' : ''}`}>
           <Settings className="nav-icon" size={20} />
           <span className="nav-label">Settings</span>
-        </button>
+        </Link>
       </div>
     </aside>
   );

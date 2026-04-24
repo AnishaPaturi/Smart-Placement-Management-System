@@ -20,11 +20,11 @@ const Navbar = () => {
       </div>
 
       <div className="navbar-actions">
-        <button className="icon-btn">
+        <button className="icon-btn" onClick={() => navigate('/notifications')} title="Notifications">
           <Bell size={20} />
           <span className="badge"></span>
         </button>
-        <div className="user-profile">
+        <div className="user-profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }} title="My Profile">
           <div className="avatar">
             <User size={18} />
           </div>

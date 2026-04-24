@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Filter, CheckCircle, XCircle, Download } from 'lucide-react';
 import api from '../api/axios';
 import './TablePage.css';
 
@@ -28,6 +28,39 @@ const Applications = () => {
     fetchApplications();
   }, []);
 
+  const exportToCSV = () => {
+    if (applications.length === 0) {
+      alert("No data to export");
+      return;
+    }
+    
+    const headers = ['ID', 'Student Name', 'USN', 'Company', 'Role', 'Status'];
+    const csvRows = [headers.join(',')];
+    
+    applications.forEach(app => {
+      const row = [
+        app.id,
+        `"${app.studentName}"`,
+        `"${app.usn}"`,
+        `"${app.company}"`,
+        `"${app.role}"`,
+        `"${app.status}"`
+      ];
+      csvRows.push(row.join(','));
+    });
+    
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'applications_report.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="table-page animate-fade-in">
       <div className="page-header flex-between">
@@ -43,10 +76,16 @@ const Applications = () => {
             <Search size={18} />
             <input type="text" placeholder="Search applications..." className="input-control" />
           </div>
-          <button className="btn btn-secondary">
-            <Filter size={18} />
-            Filters
-          </button>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button className="btn btn-primary" onClick={exportToCSV}>
+              <Download size={18} />
+              Export CSV
+            </button>
+            <button className="btn btn-secondary">
+              <Filter size={18} />
+              Filters
+            </button>
+          </div>
         </div>
 
         <div className="table-wrapper">
