@@ -20,3 +20,4 @@ public class AdminRepository {
         return admins.isEmpty() ? null : admins.get(0);
     }
 }
+

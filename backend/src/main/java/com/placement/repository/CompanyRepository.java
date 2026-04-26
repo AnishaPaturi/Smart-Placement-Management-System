@@ -24,3 +24,4 @@ public class CompanyRepository {
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Company.class));
     }
 }
+

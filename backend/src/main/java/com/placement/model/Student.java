@@ -11,6 +11,10 @@ public class Student {
     private String skills;
     private String certifications;
     private String resumeUrl;
+    private String education;
+    private String experience;
+    private String projects;
+    private String summary;
 
     public Student() {}
 
@@ -34,4 +38,17 @@ public class Student {
     public void setCertifications(String certifications) { this.certifications = certifications; }
     public String getResumeUrl() { return resumeUrl; }
     public void setResumeUrl(String resumeUrl) { this.resumeUrl = resumeUrl; }
+    public String getEducation() { return education; }
+    public void setEducation(String education) { this.education = education; }
+    public String getExperience() { return experience; }
+    public void setExperience(String experience) { this.experience = experience; }
+    public String getProjects() { return projects; }
+    public void setProjects(String projects) { this.projects = projects; }
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
+    public String getResetToken() { return resetToken; }
+    public void setResetToken(String resetToken) { this.resetToken = resetToken; }
+
+    private String resetToken;
 }
+

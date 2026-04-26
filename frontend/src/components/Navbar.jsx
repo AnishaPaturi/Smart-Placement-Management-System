@@ -1,43 +1,66 @@
-import { Bell, Search, User, LogOut } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import './Navbar.css';
+import { Bell, Sun, Moon, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import "./Navbar.css";
 
-const Navbar = () => {
+const Navbar = ({ toggleTheme, theme }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/");
   };
 
   return (
-    <header className="navbar">
-      <div className="search-bar">
-        <Search className="search-icon" size={18} />
-        <input type="text" placeholder="Search students, companies..." />
-      </div>
-
-      <div className="navbar-actions">
-        <button className="icon-btn" onClick={() => navigate('/notifications')} title="Notifications">
-          <Bell size={20} />
-          <span className="badge"></span>
-        </button>
-        <div className="user-profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }} title="My Profile">
-          <div className="avatar">
-            <User size={18} />
-          </div>
-          <div className="user-info">
-            <span className="user-name">{user?.name || 'User'}</span>
-            <span className="user-role">{user?.role === 'ADMIN' ? 'Placement Officer' : 'Student'}</span>
-          </div>
+    <nav className="navbar">
+      <div className="navbar-content">
+        <div className="navbar-left">
+          <Link
+            to={user ? (user.role === "ADMIN" ? "/dashboard" : "/student-dashboard") : "/"}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <h2 style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--text-primary)" }}>
+              SmartPlace
+            </h2>
+          </Link>
         </div>
-        <button className="icon-btn logout-btn" onClick={handleLogout} title="Logout">
-          <LogOut size={20} />
-        </button>
+
+        <div className="navbar-right">
+          <button
+            className="icon-btn"
+            onClick={toggleTheme}
+            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
+          <button className="icon-btn" title="Notifications">
+            <Bell size={20} />
+          </button>
+
+          {user && (
+            <>
+              <div className="navbar-user">
+                <div className="avatar-sm">{user?.name?.charAt(0) || "U"}</div>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                  <span style={{ fontSize: "0.9rem", fontWeight: 500, color: "var(--text-primary)" }}>
+                    {user?.name || "User"}
+                  </span>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                    {user?.role === "ADMIN" ? "Administrator" : "Student"}
+                  </span>
+                </div>
+              </div>
+
+              <button className="icon-btn" onClick={handleLogout} title="Logout" style={{ marginLeft: "0.5rem" }}>
+                <LogOut size={20} />
+              </button>
+            </>
+          )}
+        </div>
       </div>
-    </header>
+    </nav>
   );
 };
 

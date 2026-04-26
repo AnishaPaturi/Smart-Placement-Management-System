@@ -55,27 +55,47 @@ public class DriveController {
         return ResponseEntity.ok("Applied successfully");
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateDrive(@PathVariable int id, @RequestBody Drive drive) {
+        drive.setId(id);
+        int result = driveRepository.update(drive);
+        if (result > 0) {
+            return ResponseEntity.ok("Drive updated successfully");
+        }
+        return ResponseEntity.status(404).body("Drive not found");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDrive(@PathVariable int id) {
+        int result = driveRepository.delete(id);
+        if (result > 0) {
+            return ResponseEntity.ok("Drive deleted successfully");
+        }
+        return ResponseEntity.status(404).body("Drive not found");
+    }
+
     @PostMapping("/{driveId}/shortlist")
     public List<Student> shortlistForDrive(@PathVariable int driveId) {
         Drive drive = driveRepository.findById(driveId);
-        
+
         List<Application> applications = applicationRepository.findByDriveId(driveId);
         List<Integer> applicantIds = applications.stream().map(Application::getStudentId).collect(Collectors.toList());
-        
+
         List<Student> allApplicants = studentRepository.findAll().stream()
                 .filter(s -> applicantIds.contains(s.getId()))
                 .collect(Collectors.toList());
-        
+
         List<Student> eligible = eligibilityEngine.filterEligibleStudents(allApplicants, drive);
         List<Student> shortlisted = shortlistingAlgorithm.shortlist(eligible, drive);
-        
+
         for (Student s : shortlisted) {
             Application app = applications.stream().filter(a -> a.getStudentId().equals(s.getId())).findFirst().orElse(null);
             if (app != null) {
                 applicationRepository.updateStatus(app.getId(), "SHORTLISTED");
             }
         }
-        
+
         return shortlisted;
     }
 }
+

@@ -25,3 +25,4 @@ public class AnalyticsController {
         return response;
     }
 }
+

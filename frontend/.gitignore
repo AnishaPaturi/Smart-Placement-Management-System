@@ -1,3 +1,6 @@
+# Spring Boot config file
+backend/src/main/resources/application.properties
+
 # Logs
 logs
 *.log

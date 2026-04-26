@@ -36,3 +36,4 @@ public class AnalyticsService {
         return avg != null ? Math.round(avg * 100.0) / 100.0 : 0.0;
     }
 }
+

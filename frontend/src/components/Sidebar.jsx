@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Users, Briefcase, FileText, Settings, UserCircle } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, FileText, Settings, UserCircle, Sparkles, ListTodo, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './Sidebar.css';
 
@@ -9,10 +9,13 @@ const adminNavItems = [
   { path: '/students', label: 'Students', icon: Users },
   { path: '/companies', label: 'Companies', icon: Briefcase },
   { path: '/applications', label: 'Applications', icon: FileText },
+  { path: '/drives', label: 'Drives', icon: Calendar },
+  { path: '/rounds', label: 'Rounds', icon: ListTodo },
 ];
 
 const studentNavItems = [
   { path: '/student-dashboard', label: 'My Dashboard', icon: LayoutDashboard },
+  { path: '/ai-analysis', label: 'AI Analysis', icon: Sparkles },
 ];
 
 const Sidebar = () => {

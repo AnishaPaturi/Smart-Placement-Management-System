@@ -23,4 +23,15 @@ public class RoundRepository {
         String sql = "SELECT * FROM rounds WHERE drive_id = ?";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Round.class), driveId);
     }
+
+    public int update(Round round) {
+        String sql = "UPDATE rounds SET drive_id = ?, round_name = ?, round_date = ? WHERE id = ?";
+        return jdbcTemplate.update(sql, round.getDriveId(), round.getRoundName(), round.getRoundDate(), round.getId());
+    }
+
+    public int delete(int id) {
+        String sql = "DELETE FROM rounds WHERE id = ?";
+        return jdbcTemplate.update(sql, id);
+    }
 }
+

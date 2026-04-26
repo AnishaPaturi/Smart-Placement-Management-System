@@ -26,3 +26,4 @@ public class CompanyController {
         return companyRepository.findAll();
     }
 }
+

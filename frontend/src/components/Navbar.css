@@ -14,6 +14,25 @@
   background: rgba(10, 10, 15, 0.8);
 }
 
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .search-bar {
   position: relative;
   width: 300px;

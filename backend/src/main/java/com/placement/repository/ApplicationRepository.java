@@ -38,6 +38,15 @@ public class ApplicationRepository {
                      "WHERE a.drive_id = ?";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Application.class), driveId);
     }
+
+    public Application findById(int id) {
+        String sql = "SELECT a.*, s.name as student_name, d.role as role FROM applications a " +
+                     "JOIN students s ON a.student_id = s.id " +
+                     "LEFT JOIN drives d ON a.drive_id = d.id " +
+                     "WHERE a.id = ?";
+        List<Application> results = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Application.class), id);
+        return results.isEmpty() ? null : results.get(0);
+    }
     
     public List<Application> findAll() {
         String sql = "SELECT a.*, s.name as student_name, d.role, c.name as company_name FROM applications a " +
@@ -47,3 +56,4 @@ public class ApplicationRepository {
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Application.class));
     }
 }
+

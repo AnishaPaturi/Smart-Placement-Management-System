@@ -24,10 +24,23 @@ public class DriveRepository {
         String sql = "SELECT d.*, c.name as company_name FROM drives d JOIN companies c ON d.company_id = c.id";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Drive.class));
     }
-    
+
     public Drive findById(int id) {
         String sql = "SELECT d.*, c.name as company_name FROM drives d JOIN companies c ON d.company_id = c.id WHERE d.id = ?";
         List<Drive> drives = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Drive.class), id);
         return drives.isEmpty() ? null : drives.get(0);
     }
+
+    public int update(Drive drive) {
+        String sql = "UPDATE drives SET company_id = ?, role = ?, package_lpa = ?, min_cgpa = ?, allowed_branches = ?, drive_date = ? WHERE id = ?";
+        return jdbcTemplate.update(sql,
+                drive.getCompanyId(), drive.getRole(), drive.getPackageLpa(),
+                drive.getMinCgpa(), drive.getAllowedBranches(), drive.getDriveDate(), drive.getId());
+    }
+
+    public int delete(int id) {
+        String sql = "DELETE FROM drives WHERE id = ?";
+        return jdbcTemplate.update(sql, id);
+    }
 }
+

@@ -13,30 +13,56 @@ const Dashboard = () => {
     placedRate: '0%'
   });
   const [drives, setDrives] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
+  const [branchData, setBranchData] = useState([]);
   const [runningEngine, setRunningEngine] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [studentsRes, companiesRes, drivesRes] = await Promise.all([
+        const [studentsRes, companiesRes, drivesRes, analyticsRes, applicationsRes] = await Promise.all([
           api.get('/students'),
           api.get('/companies'),
-          api.get('/drives')
+          api.get('/drives'),
+          api.get('/analytics/dashboard'),
+          api.get('/applications')
         ]);
-        
+
         setDrives(drivesRes.data);
-        
+
+        const totalStudents = studentsRes.data.length;
+        const totalPlaced = analyticsRes.data.totalPlaced || 0;
+        const placedRate = totalStudents > 0 ? Math.round((totalPlaced / totalStudents) * 100) + '%' : '0%';
+
         setStats({
-          students: studentsRes.data.length,
+          students: totalStudents,
           companies: companiesRes.data.length,
-          applications: 15, // Mock for now until applications endpoint is solid
-          placedRate: '24%' // Mock rate
+          applications: applicationsRes.data.length,
+          placedRate: placedRate
         });
+
+        setAnalytics(analyticsRes.data);
+
+        // Calculate branch distribution
+        const branchCounts = {};
+        studentsRes.data.forEach(s => {
+          if (s.branch) {
+            branchCounts[s.branch] = (branchCounts[s.branch] || 0) + 1;
+          }
+        });
+
+        const colors = ['var(--brand-primary)', 'var(--brand-accent)', 'var(--success)', 'var(--warning)'];
+        const branchArray = Object.entries(branchCounts).map(([name, value], idx) => ({
+          name,
+          value,
+          fill: colors[idx % colors.length]
+        }));
+        setBranchData(branchArray);
       } catch (error) {
         console.error("Error fetching dashboard stats", error);
       }
     };
-    
+
     fetchStats();
   }, []);
 
@@ -86,13 +112,13 @@ const Dashboard = () => {
             <h3>Placement Trends (Last 6 Months)</h3>
             <div style={{ height: '300px', marginTop: '1.5rem' }}>
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={[
-                  { month: 'Jan', placements: 45 },
-                  { month: 'Feb', placements: 52 },
-                  { month: 'Mar', placements: 38 },
-                  { month: 'Apr', placements: 65 },
-                  { month: 'May', placements: 85 },
-                  { month: 'Jun', placements: 120 }
+                <AreaChart data={analytics?.monthlyPlacements || [
+                  { month: 'Jan', placements: 0 },
+                  { month: 'Feb', placements: 0 },
+                  { month: 'Mar', placements: 0 },
+                  { month: 'Apr', placements: 0 },
+                  { month: 'May', placements: 0 },
+                  { month: 'Jun', placements: 0 }
                 ]}>
                   <defs>
                     <linearGradient id="colorPlacements" x1="0" y1="0" x2="0" y2="1">
