@@ -32,7 +32,6 @@ public class AiService {
             throw new RuntimeException("Could not extract text from the PDF.");
         }
 
-        // Limit text to avoid huge token usage
         if (resumeText.length() > 10000) {
             resumeText = resumeText.substring(0, 10000);
         }
@@ -59,7 +58,6 @@ public class AiService {
             throw new RuntimeException("Could not extract text from the PDF.");
         }
 
-        // Limit text to avoid huge token usage
         if (resumeText.length() > 10000) {
             resumeText = resumeText.substring(0, 10000);
         }
@@ -106,38 +104,41 @@ public class AiService {
             ResponseEntity<String> response = restTemplate.postForEntity(OPENROUTER_URL, entity, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
-                JsonNode root = objectMapper.readTree(response.getBody());
-                String aiMessage = root.path("choices").get(0).path("message").path("content").asText();
-
-                // Clean up potential markdown formatting if the model disobeys
-                if (aiMessage.startsWith("```json")) {
-                    aiMessage = aiMessage.substring(7);
-                }
-                if (aiMessage.startsWith("```")) {
-                    aiMessage = aiMessage.substring(3);
-                }
-                if (aiMessage.endsWith("```")) {
-                    aiMessage = aiMessage.substring(0, aiMessage.length() - 3);
+                String body = response.getBody();
+                if (body == null || body.trim().isEmpty()) {
+                    throw new RuntimeException("OpenRouter returned empty response");
                 }
 
-                return objectMapper.readValue(aiMessage.trim(), Map.class);
+                JsonNode root = objectMapper.readTree(body);
+                JsonNode choices = root.path("choices");
+                if (choices.isMissingNode() || choices.size() == 0) {
+                    throw new RuntimeException("OpenRouter response missing choices field. Body: " + body.substring(0, Math.min(body.length(), 200)));
+                }
+
+                String aiMessage = choices.get(0).path("message").path("content").asText();
+                if (aiMessage == null || aiMessage.trim().isEmpty()) {
+                    throw new RuntimeException("OpenRouter returned empty message content");
+                }
+
+                String cleaned = aiMessage.trim();
+                if (cleaned.startsWith("```json")) {
+                    cleaned = cleaned.substring(7);
+                }
+                if (cleaned.startsWith("```")) {
+                    cleaned = cleaned.substring(3);
+                }
+                if (cleaned.endsWith("```")) {
+                    cleaned = cleaned.substring(0, cleaned.length() - 3);
+                }
+
+                return objectMapper.readValue(cleaned.trim(), Map.class);
             } else {
-                throw new RuntimeException("API returned status: " + response.getStatusCode());
+                String respBody = response.getBody() != null ? response.getBody() : "No response body";
+                throw new RuntimeException("OpenRouter API returned " + response.getStatusCode() + ": " + respBody);
             }
         } catch (Exception e) {
             System.err.println("Error calling OpenRouter: " + e.getMessage());
-            throw new RuntimeException("Failed to analyze resume via AI.", e);
-        }
-    }
-
-    private String extractTextFromPdf(MultipartFile file) {
-        try (InputStream is = file.getInputStream();
-             PDDocument document = PDDocument.load(is)) {
-            PDFTextStripper stripper = new PDFTextStripper();
-            return stripper.getText(document);
-        } catch (IOException e) {
-            System.err.println("Error reading PDF: " + e.getMessage());
-            return null;
+            throw new RuntimeException("AI service unavailable: " + e.getMessage(), e);
         }
     }
 
@@ -147,7 +148,6 @@ public class AiService {
             throw new RuntimeException("Could not extract text from the PDF.");
         }
 
-        // Limit text to avoid huge token usage
         if (resumeText.length() > 10000) {
             resumeText = resumeText.substring(0, 10000);
         }
@@ -183,10 +183,9 @@ public class AiService {
                 "]" +
                 "}";
 
-        // Call AI with both resume and job description
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", "google/gemini-2.5-flash");
-        requestBody.put("max_tokens", 1500);
+        requestBody.put("max_tokens", 800);
 
         Map<String, String> systemMessage = new HashMap<>();
         systemMessage.put("role", "system");
@@ -212,23 +211,35 @@ public class AiService {
             ResponseEntity<String> response = restTemplate.postForEntity(OPENROUTER_URL, entity, String.class);
 
             if (response.getStatusCode() == HttpStatus.OK) {
-                JsonNode root = objectMapper.readTree(response.getBody());
-                String aiMessage = root.path("choices").get(0).path("message").path("content").asText();
-
-                // Clean up potential markdown formatting
-                if (aiMessage.startsWith("```json")) {
-                    aiMessage = aiMessage.substring(7);
-                }
-                if (aiMessage.startsWith("```")) {
-                    aiMessage = aiMessage.substring(3);
-                }
-                if (aiMessage.endsWith("```")) {
-                    aiMessage = aiMessage.substring(0, aiMessage.length() - 3);
+                String body = response.getBody();
+                if (body == null || body.trim().isEmpty()) {
+                    throw new RuntimeException("OpenRouter returned empty response");
                 }
 
-                Map<String, Object> result = objectMapper.readValue(aiMessage.trim(), Map.class);
+                JsonNode root = objectMapper.readTree(body);
+                JsonNode choices = root.path("choices");
+                if (choices.isMissingNode() || choices.size() == 0) {
+                    throw new RuntimeException("OpenRouter response missing choices field. Body: " + body.substring(0, Math.min(body.length(), 200)));
+                }
 
-                // Ensure atsScore is a proper number
+                String aiMessage = choices.get(0).path("message").path("content").asText();
+                if (aiMessage == null || aiMessage.trim().isEmpty()) {
+                    throw new RuntimeException("OpenRouter returned empty message content");
+                }
+
+                String cleaned = aiMessage.trim();
+                if (cleaned.startsWith("```json")) {
+                    cleaned = cleaned.substring(7);
+                }
+                if (cleaned.startsWith("```")) {
+                    cleaned = cleaned.substring(3);
+                }
+                if (cleaned.endsWith("```")) {
+                    cleaned = cleaned.substring(0, cleaned.length() - 3);
+                }
+
+                Map<String, Object> result = objectMapper.readValue(cleaned.trim(), Map.class);
+
                 if (result.get("atsScore") instanceof Number) {
                     result.put("atsScore", ((Number) result.get("atsScore")).intValue());
                 } else {
@@ -237,12 +248,23 @@ public class AiService {
 
                 return result;
             } else {
-                throw new RuntimeException("API returned status: " + response.getStatusCode());
+                String respBody = response.getBody() != null ? response.getBody() : "No response body";
+                throw new RuntimeException("OpenRouter API returned " + response.getStatusCode() + ": " + respBody);
             }
         } catch (Exception e) {
             System.err.println("Error calling OpenRouter for ATS: " + e.getMessage());
-            throw new RuntimeException("Failed to analyze ATS resume.", e);
+            throw new RuntimeException("ATS analysis failed: " + e.getMessage(), e);
+        }
+    }
+
+    private String extractTextFromPdf(MultipartFile file) {
+        try (InputStream is = file.getInputStream();
+             PDDocument document = PDDocument.load(is)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document);
+        } catch (IOException e) {
+            System.err.println("Error reading PDF: " + e.getMessage());
+            return null;
         }
     }
 }
-
