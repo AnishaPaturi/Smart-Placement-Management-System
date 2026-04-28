@@ -1,0 +1,26 @@
+# Sensitive config
+
+backend/src/main/resources/application.properties
+
+# Optional local variants
+
+backend/src/main/resources/application-*.properties
+backend/src/main/resources/application-*.yml
+
+# Node frontend
+
+node_modules/
+dist/
+build/
+
+# Java
+
+target/
+*.class
+*.jar
+
+# IDE
+
+.idea/
+.vscode/
+*.iml
